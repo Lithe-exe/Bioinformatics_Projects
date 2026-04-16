@@ -37,8 +37,11 @@ def run_scrna_pipeline():
     adata.raw= adata
     adata = adata[:, adata.var.highly_variable].copy()
 
-    sc.pp.neighbors(adata, n_neighbors=10, n_pcs=40)
+    sc.tl.pca(adata, svd_solver='arpack')
+
+    sc.pp.neighbors(adata, n_neighbors=10, use_rep='X_pca')
     sc.tl.leiden(adata, resolution=0.5)
+    sc.tl.umap(adata)
     print("Differential expression analysis...")
     sc.tl.rank_genes_groups(adata, 'leiden', method='t-test')
 
